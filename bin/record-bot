@@ -1,0 +1,11 @@
+#!/bin/sh
+# Launch the TypeScript CLI. SIGINT/SIGTERM go to this Node process.
+set -eu
+root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+node_bin=${NODE:-node}
+major=$("$node_bin" -p "process.versions.node.split('.')[0]")
+strip=
+if [ "$major" -lt 24 ]; then
+	strip=--experimental-strip-types
+fi
+exec "$node_bin" $strip "$root/cli/index.ts" "$@"

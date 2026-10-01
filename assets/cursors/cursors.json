@@ -1,0 +1,9 @@
+{
+  "_notice": "Regenerated from the local macOS system cursors via `make cursors`. Redistributors should regenerate or substitute an open-licensed cursor set.",
+  "size": 128,
+  "cursors": {
+    "arrow": { "file": "arrow.png", "hotspot": { "x": 16, "y": 16 } },
+    "pointer": { "file": "pointer.png", "hotspot": { "x": 42, "y": 26 } },
+    "text": { "file": "text.png", "hotspot": { "x": 38, "y": 35 } }
+  }
+}

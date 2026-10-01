@@ -1,0 +1,8 @@
+node_modules/
+.release-files/
+.cache/
+.venv/
+demo/out/
+__pycache__/
+*.log
+.DS_Store

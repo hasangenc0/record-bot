@@ -1,0 +1,49 @@
+name: Modal record
+
+on:
+  workflow_dispatch:
+    inputs:
+      scenario:
+        description: "Demo scenario to record (e.g. harbor, github, or harbor,github)"
+        required: false
+        default: "harbor"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  record:
+    name: Record demo on Modal
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+    steps:
+      - name: Check Modal token
+        run: |
+          if [ -z "$MODAL_TOKEN_ID" ] || [ -z "$MODAL_TOKEN_SECRET" ]; then
+            echo "Add repository secrets MODAL_TOKEN_ID and MODAL_TOKEN_SECRET."
+            echo "Create a token at https://modal.com/settings then paste the id and secret."
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+
+      - name: Record demo
+        run: uv run --with modal modal run cloud/record.py --scenario "${{ inputs.scenario }}"
+
+      - name: Upload MP4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: modal-record
+          path: demo/out/modal-*.mp4
+          if-no-files-found: error

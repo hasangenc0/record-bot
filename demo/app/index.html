@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Harbor</title>
+		<style>
+			:root {
+				--bg: #121014;
+				--panel: #1a171c;
+				--card: #221e24;
+				--line: #322c34;
+				--ink: #f3ece4;
+				--muted: #9a9088;
+				--gold: #d4a574;
+				--gold-dim: #d4a57433;
+				--go: #7d9a6f;
+				--hold: #c9845a;
+			}
+
+			* {
+				box-sizing: border-box;
+			}
+
+			html,
+			body {
+				margin: 0;
+				height: 100%;
+				background: var(--bg);
+				color: var(--ink);
+				font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+				cursor: default;
+			}
+
+			button,
+			input {
+				font: inherit;
+			}
+
+			button,
+			.move,
+			.new-task,
+			.add-task,
+			.user {
+				cursor: pointer;
+			}
+
+			input,
+			.search {
+				cursor: text;
+			}
+
+			.shell {
+				height: 100%;
+				display: grid;
+				grid-template-rows: 64px 1fr;
+			}
+
+			header {
+				display: flex;
+				align-items: center;
+				gap: 24px;
+				padding: 0 28px;
+				border-bottom: 1px solid var(--line);
+			}
+
+			.brand {
+				font-size: 18px;
+				font-weight: 650;
+				letter-spacing: 0.04em;
+			}
+
+			.brand span {
+				color: var(--gold);
+			}
+
+			.search {
+				flex: 1;
+				max-width: 360px;
+				background: var(--panel);
+				border: 1px solid var(--line);
+				border-radius: 10px;
+				color: var(--ink);
+				padding: 8px 12px;
+				outline: none;
+			}
+
+			.search:focus {
+				border-color: var(--gold);
+			}
+
+			.user {
+				margin-left: auto;
+				width: 32px;
+				height: 32px;
+				border-radius: 50%;
+				background: var(--gold-dim);
+				color: var(--gold);
+				display: grid;
+				place-items: center;
+				font-size: 12px;
+				font-weight: 650;
+			}
+
+			main {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 18px;
+				padding: 22px 28px 28px;
+				min-height: 0;
+			}
+
+			.column {
+				background: var(--panel);
+				border: 1px solid var(--line);
+				border-radius: 16px;
+				min-height: 0;
+				display: flex;
+				flex-direction: column;
+				padding: 16px;
+			}
+
+			.column-head {
+				display: flex;
+				align-items: baseline;
+				justify-content: space-between;
+				margin-bottom: 12px;
+			}
+
+			.column-head h2 {
+				margin: 0;
+				font-size: 13px;
+				font-weight: 650;
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
+				color: var(--muted);
+			}
+
+			.count {
+				font-size: 12px;
+				color: var(--gold);
+			}
+
+			.cards {
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+				overflow: auto;
+				min-height: 0;
+				flex: 1;
+			}
+
+			article {
+				background: var(--card);
+				border: 1px solid var(--line);
+				border-radius: 12px;
+				padding: 14px;
+			}
+
+			article h3 {
+				margin: 0 0 8px;
+				font-size: 15px;
+				font-weight: 600;
+			}
+
+			.meta {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 8px;
+			}
+
+			.tag {
+				font-size: 11px;
+				letter-spacing: 0.04em;
+				text-transform: uppercase;
+				color: var(--gold);
+				background: var(--gold-dim);
+				border-radius: 999px;
+				padding: 3px 8px;
+			}
+
+			.tag.green {
+				color: var(--go);
+				background: #7d9a6f22;
+			}
+
+			.tag.clay {
+				color: var(--hold);
+				background: #c9845a22;
+			}
+
+			.move {
+				background: transparent;
+				border: 1px solid var(--line);
+				color: var(--ink);
+				border-radius: 8px;
+				padding: 4px 8px;
+				font-size: 12px;
+			}
+
+			.move:hover {
+				border-color: var(--gold);
+				color: var(--gold);
+			}
+
+			.composer {
+				display: none;
+				gap: 8px;
+				margin-bottom: 10px;
+			}
+
+			.composer.open {
+				display: flex;
+			}
+
+			.composer input {
+				flex: 1;
+				background: var(--bg);
+				border: 1px solid var(--line);
+				border-radius: 8px;
+				color: var(--ink);
+				padding: 8px 10px;
+				outline: none;
+			}
+
+			.composer input:focus {
+				border-color: var(--gold);
+			}
+
+			.new-task,
+			.add-task {
+				background: var(--gold);
+				color: #1a120c;
+				border: 0;
+				border-radius: 8px;
+				padding: 8px 12px;
+				font-weight: 650;
+				font-size: 13px;
+			}
+
+			.new-task {
+				width: 100%;
+				margin-bottom: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="shell" data-testid="board">
+			<header>
+				<div class="brand">Har<span>bor</span></div>
+				<input class="search" data-testid="search" placeholder="Search tasks" />
+				<div class="user">MG</div>
+			</header>
+			<main>
+				<section class="column" data-column="ready">
+					<div class="column-head">
+						<h2>Ready</h2>
+						<span class="count" data-count>0</span>
+					</div>
+					<button class="new-task" data-testid="new-task" type="button">New task</button>
+					<form class="composer" data-testid="new-task-form">
+						<input data-testid="task-title" name="title" placeholder="Task title" />
+						<button class="add-task" data-testid="submit-task" type="submit">Add</button>
+					</form>
+					<div class="cards" data-testid="ready-cards"></div>
+				</section>
+				<section class="column" data-column="doing">
+					<div class="column-head">
+						<h2>Doing</h2>
+						<span class="count" data-count>0</span>
+					</div>
+					<div class="cards" data-testid="doing-cards"></div>
+				</section>
+				<section class="column" data-column="done">
+					<div class="column-head">
+						<h2>Done</h2>
+						<span class="count" data-count>0</span>
+					</div>
+					<div class="cards" data-testid="done-cards"></div>
+				</section>
+			</main>
+		</div>
+		<script>
+			const order = ["ready", "doing", "done"];
+			const seed = [
+				{ id: "onboarding", title: "Onboard Nova", tag: "People", column: "ready", tone: "" },
+				{
+					id: "design-review",
+					title: "Design review",
+					tag: "Now",
+					column: "doing",
+					tone: "clay",
+				},
+				{ id: "staging", title: "Set up staging", tag: "Shipped", column: "done", tone: "green" },
+			];
+			let query = "";
+
+			function cardHtml(task) {
+				const tagClass = task.tone ? `tag ${task.tone}` : "tag";
+				const moveLabel = task.column === "done" ? "Done" : "Move";
+				return `<article data-testid="card-${task.id}" data-id="${task.id}">
+					<h3>${task.title}</h3>
+					<div class="meta">
+						<span class="${tagClass}">${task.tag}</span>
+						<button class="move" type="button" data-move="${task.id}">${moveLabel}</button>
+					</div>
+				</article>`;
+			}
+
+			function matchesSearch(task) {
+				if (!query) {
+					return true;
+				}
+				return `${task.title} ${task.tag}`.toLowerCase().includes(query);
+			}
+
+			function render() {
+				for (const column of order) {
+					const root = document.querySelector(`[data-column="${column}"] .cards`);
+					const tasks = seed.filter((task) => task.column === column && matchesSearch(task));
+					root.innerHTML = tasks.map(cardHtml).join("");
+					document.querySelector(`[data-column="${column}"] [data-count]`).textContent =
+						String(tasks.length);
+				}
+			}
+
+			function nextColumn(column) {
+				return order[Math.min(order.indexOf(column) + 1, order.length - 1)];
+			}
+
+			document.addEventListener("click", (event) => {
+				const move = event.target.closest("[data-move]");
+				if (!move) {
+					return;
+				}
+				const task = seed.find((entry) => entry.id === move.getAttribute("data-move"));
+				if (!task) {
+					return;
+				}
+				const dest = nextColumn(task.column);
+				if (dest === task.column) {
+					return;
+				}
+				task.column = dest;
+				if (dest === "doing") {
+					task.tag = "Now";
+					task.tone = "clay";
+				}
+				if (dest === "done") {
+					task.tag = "Shipped";
+					task.tone = "green";
+				}
+				render();
+			});
+
+			const form = document.querySelector("[data-testid='new-task-form']");
+			document.querySelector("[data-testid='new-task']").addEventListener("click", () => {
+				form.classList.add("open");
+				form.querySelector("input").focus();
+			});
+
+			form.addEventListener("submit", (event) => {
+				event.preventDefault();
+				const input = form.querySelector("input");
+				const title = input.value.trim();
+				if (!title) {
+					return;
+				}
+				seed.unshift({
+					id: title.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""),
+					title,
+					tag: "New",
+					column: "ready",
+					tone: "",
+				});
+				input.value = "";
+				form.classList.remove("open");
+				render();
+			});
+
+			const search = document.querySelector("[data-testid='search']");
+			search.addEventListener("input", () => {
+				query = search.value.trim().toLowerCase();
+				render();
+			});
+
+			render();
+		</script>
+	</body>
+</html>

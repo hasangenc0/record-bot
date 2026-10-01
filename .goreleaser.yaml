@@ -1,0 +1,92 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+version: 2
+
+project_name: record-bot
+
+before:
+  hooks:
+    - make bundle
+
+builds:
+  - id: record-bot
+    builder: bun
+    binary: record-bot
+    main: cli/index.ts
+    targets:
+      - linux-x64-modern
+      - linux-arm64
+      - darwin-x64
+      - darwin-arm64
+      - windows-x64-modern
+    flags:
+      - --minify
+      - --external=ffmpeg-static
+
+archives:
+  - formats: [tar.gz]
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files:
+      - README.md
+      - package.json
+      - python/voiceover.py
+      - python/requirements.txt
+      - skills/record-bot/SKILL.md
+      - skills/record-bot/references/pitfalls.md
+      - src: ".release-files/{{ .Os }}_{{ .Arch }}/helpers/*"
+        dst: helpers
+        strip_parent: true
+
+checksum:
+  name_template: checksums.txt
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^ci:"
+
+release:
+  github:
+    owner: hasangenc0
+    name: record-bot
+  prerelease: auto
+  footer: >-
+
+    ---
+
+    Extract the archive and keep `helpers/`, `skills/`, and `python/` next to
+    `record-bot`. `helpers/` holds the platform capture binaries and a bundled
+    FFmpeg. `record-bot skill --json` reads the playbook from `skills/`.
+    First `voiceover` installs F5-TTS into the user data directory.
+
+    macOS: grant Screen Recording (and Microphone if you use `--mic`) to this
+    `record-bot` binary, or to the terminal that launches it.
+
+    Released with [GoReleaser](https://goreleaser.com).
+
+homebrew_casks:
+  - name: record-bot
+    homepage: https://github.com/hasangenc0/record-bot
+    description: Headless screen recorder CLI for scripts and AI agents
+    skip_upload: true
+    binaries:
+      - record-bot
+    caveats: >-
+      Grant Screen Recording to record-bot (System Settings → Privacy &
+      Security). Keep helpers/, skills/, and python/ from the archive next to
+      the binary; Homebrew leaves them in the Caskroom. Agents should run
+      record-bot skill --json. First voiceover installs F5-TTS into
+      Application Support. Unsigned builds may be quarantined by Gatekeeper.
+    repository:
+      owner: hasangenc0
+      name: homebrew-tap

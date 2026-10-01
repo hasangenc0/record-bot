@@ -1,0 +1,29 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.3.13/schema.json",
+	"files": {
+		"includes": [
+			"cli/**",
+			"demo/**/*.ts",
+			"skills/**/*.ts",
+			"package.json",
+			"tsconfig.json",
+			"biome.json",
+			"vitest.config.ts"
+		]
+	},
+	"formatter": {
+		"indentStyle": "tab",
+		"lineWidth": 96
+	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "double"
+		}
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true
+		}
+	}
+}

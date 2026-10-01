@@ -1,0 +1,68 @@
+{
+	"name": "record-bot",
+	"version": "0.1.0",
+	"description": "Headless CLI that records a screen or window to a styled MP4 (padding, background, auto-zoom, cursor) and keeps the raw capture. Built for scripts and AI agents.",
+	"author": "hasangenc0",
+	"homepage": "https://github.com/hasangenc0/record-bot",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/hasangenc0/record-bot.git"
+	},
+	"bugs": {
+		"url": "https://github.com/hasangenc0/record-bot/issues"
+	},
+	"keywords": [
+		"screen-recorder",
+		"cli",
+		"headless",
+		"agents",
+		"ffmpeg",
+		"macos"
+	],
+	"type": "module",
+	"license": "MIT",
+	"bin": {
+		"record-bot": "bin/record-bot"
+	},
+	"files": [
+		"AGENTS.md",
+		"LICENSE",
+		"Makefile",
+		"README.md",
+		"assets",
+		"bin",
+		"cli",
+		"native",
+		"python",
+		"skills/record-bot/SKILL.md",
+		"skills/record-bot/references"
+	],
+	"engines": {
+		"node": ">=22.18.0"
+	},
+	"scripts": {
+		"cli": "node cli/index.ts",
+		"postinstall": "make capture-if-needed",
+		"build": "make capture",
+		"lint": "biome lint .",
+		"lint:fix": "biome lint --write .",
+		"format": "biome format --write .",
+		"format:check": "biome format .",
+		"check": "biome check .",
+		"test": "vitest --run",
+		"test:watch": "vitest",
+		"demo": "node demo/record.ts",
+		"demo:install": "playwright install chromium",
+		"release:snapshot": "goreleaser release --snapshot --clean --skip=publish"
+	},
+	"dependencies": {
+		"ffmpeg-static": "^5.3.0"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.3.13",
+		"@types/node": "^25.0.3",
+		"playwright": "1.62.1",
+		"typescript": "^5.2.2",
+		"vitest": "^3.2.7"
+	}
+}
